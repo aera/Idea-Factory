@@ -1,0 +1,55 @@
+<div class= "row">
+<div class= "col-lg-2"></div>
+<div class="col-lg-10">
+<h1><%= @idea.title %></h1>
+<h4><%= @idea.description %></h4>
+<p><strong>Author:</strong><%= @idea.user&.full_name %></p>
+
+<% if user_signed_in? %>
+
+  <% if (can? :edit, @idea) %>
+	<%= link_to 'Edit', edit_idea_path(@idea) %>
+  <% end %>
+  <% if (can? :destroy, @idea) %>
+	<%= link_to 'Delete', idea_path(@idea),
+					  method: :delete,
+					  data: {confirm: 'Are you sure you want to delete this idea?'} %>
+  <% end %>
+<% end %>
+
+<h2>Reviews</h2>
+
+<% if user_signed_in? %>
+  <%= @idea.errors.full_messages.join(', ') %>
+	<%= form_for [@idea, @review] do |f| %>
+		<div>
+			<%= f.text_area :body %>
+		</div>
+		<div>
+			<%= f.submit%>
+		</div>
+	<% end %>
+<% end %>
+
+<% @reviews&.each do |review| %>
+  <div>
+	<hr>
+  	<p><%= review.body %></p>
+  	<% if current_user == review.user %>
+  		<p><%= link_to 'Delete',
+  	                [@idea, review],
+  					method: :delete,
+  					data: {confirm: 'Are you sure?'}%></p>
+  	<% end %>
+  	<% if current_user == @idea.user %>
+  	  <p><%= link_to 'Flag',
+  					 [@idea, review],
+  					 method: :flag %></p>
+  	<% end %>
+  	<% if review.flag == true %>
+  		<i class="fa fa-flag fa-2x" aria-hidden="true"></i>
+  	<% end %>
+  </div>
+<% end %>
+</div>
+<div class= "col-lg-2"> </div>
